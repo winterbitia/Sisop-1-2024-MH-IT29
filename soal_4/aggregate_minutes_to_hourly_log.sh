@@ -3,11 +3,11 @@
 ### ADD THIS TO THE CRONTAB
 # 0 * * * * /home/winter/Documents/ITS/SISOP/Modul1/soal_4/aggregate_minutes_to_hourly_log.sh
 
-#find all log files located in the log folder
+# find all log files located in the log folder
 user=`whoami`
 find /home/$user/log ! -name '*agg*' -name "metrics_*.log" -exec awk -F "," 'END{cmd=sprintf("numfmt --from=iec %s",$11); cmd | getline conv; close(cmd); print $0","  conv}' {} \; > temphour.txt 
 
-#create the hourly log file
+# create the hourly log file
 echo "type,mem_total,mem_used,mem_free,mem_shared,mem_buff,mem_available,swap_total,swap_used,swap_free,path,path_size" > /home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log"
     # minimum
 awk -F "," '(NR==1){t = $1} {t = $1<t ? $1:t}  END{print "minimum,"t","}
@@ -46,8 +46,8 @@ awk -F "," '{t+=$1}  END{print "average,"t/NR","}
             {m+=$12} END{cmd=sprintf("numfmt --to=iec %d",m/NR); cmd | getline conv; close(cmd); print conv}
             ' temphour.txt | paste -s -d '' >> /home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log"
 
-#manage permissions
+# manage permissions
 chmod go-rwx "/home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log""
 
-#delete the temporary text file
+# delete the temporary text file
 rm temphour.txt
