@@ -16,7 +16,7 @@ awk '/Mem/ {print $2","$3","$4","$5","$6","$7","};
      /home/ {print $2","$1}
      ' temp.txt | paste -s -d '' >> /home/$user/log/"metrics_$(date +"%Y%m%d%H%M%S").log"
 
-#manage permissions
+# manage permissions
 chmod go-rwx "/home/$user/log/""metrics_$(date +"%Y%m%d%H%M%S").log"    
 
 # delete the temporary text file
