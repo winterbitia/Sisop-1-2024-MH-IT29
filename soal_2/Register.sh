@@ -16,13 +16,8 @@ if grep -q "^$email:.*:.*:.*:.*" users.txt; then
     exit 1
 fi
 
-# Username check
+# Username input
 echo "Enter your username:" && read uname
-if grep -q "^.*:$uname:.*:.*:.*" users.txt; then
-    echo -e "\nUsername already exists. Please choose a different one."
-    echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Username already exists": [$uname]" >> log.txt
-    exit 1
-fi
 
 # Security question
 echo "Enter a security question:" && read sec_q
