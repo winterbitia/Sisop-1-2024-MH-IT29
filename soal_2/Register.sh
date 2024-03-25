@@ -7,12 +7,12 @@ echo -e "Welcome to the Registration System!\n"
 echo "Enter your email:" && read email
 if echo "$email" | grep -vo "@"; then
     echo -e "\nPlease enter a valid email."
-    echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Invalid email": [$email]" >> log.txt
+    echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Invalid email": [$email]" >> auth.log
     exit 1
 fi
 if grep -q "^$email:.*:.*:.*:.*" users.txt; then
     echo -e "\nEmail already exists. Please choose a different one."
-    echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Email already exists": [$email]" >> log.txt
+    echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Email already exists": [$email]" >> auth.log
     exit 1
 fi
 
@@ -45,4 +45,4 @@ encrypt=`echo $pass | base64`
 # Add to users.txt
 echo "$email:$uname:$sec_q:$sec_a:$encrypt" >> users.txt
 echo -e "\nREGISTRATION SUCCESSFUL!\nUse login.sh to enter your account.\n"
-echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER SUCCESS] user [$uname] register success" >> log.txt
+echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER SUCCESS] user [$uname] register success" >> auth.log
