@@ -79,7 +79,7 @@ deleteuser () {
 }
 
 admin() {
-    # Start admin module
+    # Start admin menu
     echo -e "\nWelcome! You have admin privileges."
     echo "Admin Menu"
     echo "1. Add User"
@@ -88,10 +88,10 @@ admin() {
     echo "4. Exit"
     
     echo -e "\nChoose an option: "
-    read opt
+    read locked
 
     # Select option
-    case $opt in
+    case $locked in
     1) adduser ;;
     2) edituser ;;
     3) deleteuser ;;
@@ -105,6 +105,7 @@ admin() {
 }
 
 member() {
+    # Welcome message
     echo -e "\nWelcome! You have member privileges.\n"
     return 0
 }
@@ -147,9 +148,10 @@ i_forgor() {
         echo -e "\nEmail not found."
         return 1
     else
+        # Grab security question
         sec_q=`grep "^$email:" users.txt | cut -d':' -f3`
         echo "Security question: $sec_q"
-
+        # Sec_q check
         echo "Enter your answer:" && read sec_a
         if ! grep -q "^$email:.*:.*:$sec_a" users.txt; then
             echo -e "\nIncorrect answer."
