@@ -49,5 +49,5 @@ encrypt=`echo $pass | base64`
 
 # Add to users.txt
 echo "$email:$uname:$sec_q:$sec_a:$encrypt" >> users.txt
-echo -e "\nREGISTRATION SUCCESSFUL!\n "
-echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER SUCCESS] user [$uname] registered successfully" >> log.txt
+echo -e "\nREGISTRATION SUCCESSFUL!\nUse login.sh to enter your account.\n"
+echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER SUCCESS] user [$uname] register success" >> log.txt
