@@ -5,7 +5,8 @@
 
 # find all log files located in the log folder
 user=`whoami`
-find /home/$user/log ! -name '*agg*' -name "metrics_*.log" -exec awk -F "," 'END{cmd=sprintf("numfmt --from=iec %s",$11); cmd | getline conv; close(cmd); print $0","  conv}' {} \; > temphour.txt 
+range=`date -d '-1 hour' +%Y%m%d%H`
+find /home/$user/log -name "*$range*" -not -name '*_agg_*' -exec awk -F "," 'END{cmd=sprintf("numfmt --from=iec %s",$11); cmd | getline conv; close(cmd); print $0","  conv}' {} \; > temphour.txt 
 
 # create the hourly log file
 echo "type,mem_total,mem_used,mem_free,mem_shared,mem_buff,mem_available,swap_total,swap_used,swap_free,path,path_size" > /home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log"
