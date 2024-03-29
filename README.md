@@ -97,8 +97,74 @@ Tidak ada kendala.
 
 **Dikerjakan oleh : Amoes Noland (5027231028)**
 
+Dalam soal nomor 2, kita disuruh untuk membuat sebuah **sistem identifikasi user**, yang dipenuhi dengan fitur admin untuk manajemen user. Script yang diperlukan oleh soal adalah `register.sh` dan `login.sh`.
+
 ### register.sh
-**(work in progress)**
+Script pertama yang diperlukan adalah **untuk mendaftarkan user baru ke dalam sistem.** Untuk bagian pertama, terdapat perintah kepada pengguna untuk memasukkan email. Sistem mengharuskan pengguna untuk memasukkan email yang valid **(memiliki tanda @)** dan bukan merupakan email yang sudah terdaftar pada users.txt (harus unique; akan dijelaskan lebih lanjut mengenai daftar user yang sudah registered). Bila terjadi kegagalan maka, harus mengeluarkan pesan status kegagalan sesuai waktu percobaan register dilakukan.
+
+```sh
+# Welcome message
+echo -e "Welcome to the Registration System!\n"
+
+# Email check
+echo "Enter your email:" && read email
+if echo "$email" | grep -vo "@"; then
+    echo -e "\nPlease enter a valid email."
+    echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Invalid email": [$email]" >> auth.log
+    exit 1
+fi
+if grep -q "^$email:.*:.*:.*:.*" users.txt; then
+    echo -e "\nEmail already exists. Please choose a different one."
+    echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Email already exists": [$email]" >> auth.log
+    exit 1
+fi
+```
+Berikutnya dalam program register adalah untuk meminta username (bebas), dan security question/answer untuk fitur Forgot Password yang nantinya akan diterapkan pada `login.sh`.
+```sh
+# Username input
+echo "Enter your username:" && read uname
+
+# Security question
+echo "Enter a security question:" && read sec_q
+echo "Enter a security answer:" && read sec_a
+```
+Berikutnya dalam program register adalah untuk meminta password dengan kriteria:
+* Encrypt dengan base64
+* Lebih dari 8 karakter
+* Minimal satu huruf uppercase dan lowercase
+* Minimal satu angka
+
+Hal ini dilakukan dengan menggunakan if statement yang mengecek jumlah karakter dalam string dan mencari semua kriteria jenis karakter dengan mengapitnya dengan tanda bintang (wild card) dalam perbandingan. Bila password tidak sesuai, maka sistem akan meminta hingga password terisi sesuai kriteria atau program dihentikan.
+
+```sh
+# Password check
+echo "Enter password:"
+echo "(>8 chars, 1 uppercase, 1 lowercase, 1 number)"
+read -s pass
+while true; do
+    if [[ ${#pass} -ge 8
+        && "$pass" == *[[:lower:]]*
+        && "$pass" == *[[:upper:]]*
+        && "$pass" == *[0-9]* ]]; then
+        break
+    else
+        echo "Password does not meet the requirements"
+        echo "Enter password:" && read -s pass
+    fi
+done
+```
+Enkripsi password yang telah dimasukkan sebelumnya dilakukan dengan command sebagai berikut:
+```sh
+# Add base64 encryption
+encrypt=`echo $pass | base64`
+```
+Setelah seluruh data terisi, maka hasil akan disimpan ke dalam sebuah file bernama `users.txt` yang berisi catatan seluruh user yang sudah dibuat.
+```sh
+# Add to users.txt
+echo "$email:$uname:$sec_q:$sec_a:$encrypt" >> users.txt
+echo -e "\nREGISTRATION SUCCESSFUL!\nUse login.sh to enter your account.\n"
+echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER SUCCESS] user [$uname] register success" >> auth.log
+```
 
 ### login.sh
 **(work in progress)**
@@ -109,7 +175,7 @@ Tidak ada kendala.
 ## Soal 3
 
 **Dikerjakan oleh : Malvin Putra Rismahardian (5027231048)**
-### isi soal
+### Isi soal
 
 Alyss adalah seorang gamer yang sangat menyukai bermain game Genshin Impact. Karena hobinya, dia ingin mengoleksi foto-foto karakter Genshin Impact. Suatu saat Yanuar memberikannya sebuah Link yang berisi koleksi kumpulan foto karakter dan sebuah clue yang mengarah ke penemuan gambar rahasia. Ternyata setiap nama file telah dienkripsi dengan menggunakan hexadecimal. Karena penasaran dengan apa yang dikatakan Yanuar, Alyss tidak menyerah dan mencoba untuk mengembalikan nama file tersebut kembali seperti semula.
 
@@ -143,7 +209,7 @@ e. Hasil akhir :
      wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1oGHdTf4_76_RacfmQIV4i7os4sGwa9vN'>
      unzip genshin.zip && unzip genshin_character.zip     
 
-**Penjelasan code**
+**Penjelasan Code**
 
      wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1oGHdTf4_76_RacfmQIV4i7os4sGwa9vN'
 - Perintah ini digunakan untuk mengunduh file genshin.zip dan genshin_character.zip dari Google Drive.
@@ -161,7 +227,7 @@ e. Hasil akhir :
      done   
      cd ..
 
-**Penjelasan code**
+**Penjelasan Code**
 
           for file in *; do
 * Perintah ini digunakan untuk iterasi melalui setiap file di direktori genshin_character.
@@ -212,7 +278,7 @@ e. Hasil akhir :
                echo "$Senjata : ${hitung_senjata[$Senjata]}"
           done
 
-**Penjelasan code**
+**Penjelasan Code**
 
      while IFS=, read -r Nama Region Element Senjata; do.
 
@@ -392,7 +458,7 @@ awk -F "," '(NR==1){t = $1} {t = $1>t ? $1:t}  END{print "maximum,"t","}
             (NR==1){m = $12}{m = $12>m ? $12:m}END{cmd=sprintf("numfmt --to=iec %d",m); cmd | getline conv; close(cmd); print conv}
             ' temphour.txt | paste -s -d '' >> /home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log"
 ```
-Selain itu, juga diperlukan untuk memproses semua log file yang dicari untuk mencari nilai rata-rata masing-masing kolom, hal ini dilakukan menggunakan `awk` dengan cara membagi total kolom dengan jumlah baris pada kolom. Selain itu juga dilakukan konversi nilai disk seperti bagian sebelumnya untuk perhitungan yang benar dari disk size. Setelah itu, hasil yang sudah terhitung disimpan juga dalam sebuah log file yang sama.
+Selain itu, juga diperlukan untuk memproses semua log file yang dicari untuk mencari nilai rata-rata masing-masing kolom, hal ini dilakukan menggunakan `awk` dengan cara membagi total nilai setiap kolom dengan jumlah baris pada kolom. Juga dilakukan konversi nilai disk seperti bagian sebelumnya untuk perhitungan yang benar dari disk size. Setelah itu, hasil yang sudah terhitung disimpan juga dalam sebuah log file yang sama.
 ```sh
 # average
 awk -F "," '{t+=$1}  END{print "average,"t/NR","}
@@ -415,7 +481,6 @@ maximum,15413,5804,7764,153,2783,9940,5000,0,5000,/home/winter,19G
 average,15413,5628.2,7481.3,126.2,2754.1,9784,2500,0,2500,/home/winter,19G
 ```
 Untuk memastikan bahwa file log hanya dapat dilihat oleh pemilik, maka semua permission dari *group* dan *others* harus dihilangkan. Selain itu, untuk menutup script, akan dilakukan delete `temphour.txt` agar directory milik script dapat menjadi lebih bersih.
-
 ```sh
 # manage permissions
 chmod go-rwx "/home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log""
