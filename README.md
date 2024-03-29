@@ -86,7 +86,7 @@ grep 'Adriaens' Sandbox.csv | awk -F ',' '{print $2, $6, $17}'
 # awk -F ',' '{print $2, $6, $17}': memerintahkan awk untuk mencetak kolom ke-2 (order date), ke-6 (nama konsumen), dan ke-17 (kolom sales, atau jumlah penjualan) dari setiap baris yang ditemukan.
 ```
 ###  Screenshot Hasil Pengerjaan
-
+![alt text](https://cdn.discordapp.com/attachments/1223171682500350062/1223171738532188331/tugas_sisop.png?ex=6618e273&is=66066d73&hm=7bcff634d731c093218a31bcb0d8ef4e000db8b6e13463266c2eac54ddaca4d2&)
 ### Kendala
 Tidak ada kendala.
 
