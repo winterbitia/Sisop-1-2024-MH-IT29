@@ -1,6 +1,0 @@
-[25/03/24 15:58:18] [REGISTER FAILED] ERROR Failed register attempt with error: Invalid email: []
-[25/03/24 16:03:49] [REGISTER FAILED] ERROR Failed register attempt with error: Invalid email: []
-[25/03/24 16:04:11] [REGISTER FAILED] ERROR Failed register attempt with error: Invalid email: []
-[25/03/24 16:05:08] [REGISTER FAILED] ERROR Failed register attempt with error: Invalid email: []
-[25/03/24 16:15:25] [REGISTER SUCCESS] user [sus] registered successfully
-[25/03/24 16:46:15] [REGISTER SUCCESS] user [amog] registered successfully
