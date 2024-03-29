@@ -138,7 +138,7 @@ e. Hasil akhir :
 * [image].jpg
 
 ### Penyelesaian
-**Bagian 1 : Mengunduh dan mengekstract data**
+**Bagian 1 : Mengunduh dan mengekstrak data**
 
      wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1oGHdTf4_76_RacfmQIV4i7os4sGwa9vN'>
      unzip genshin.zip && unzip genshin_character.zip     
