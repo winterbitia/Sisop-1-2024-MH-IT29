@@ -6,6 +6,7 @@
 # find all log files located in the log folder
 user=`whoami`
 range=`date -d '-1 hour' +%Y%m%d%H`
+# range=`date +%Y%m%d%H` #testing purposes
 find /home/$user/log -name "*$range*" -not -name '*_agg_*' -exec awk -F "," 'END{cmd=sprintf("numfmt --from=iec %s",$11); cmd | getline conv; close(cmd); print $0","  conv}' {} \; > temphour.txt 
 
 # create the hourly log file
