@@ -109,10 +109,188 @@ Tidak ada kendala.
 ## Soal 3
 
 **Dikerjakan oleh : Malvin Putra Rismahardian (5027231048)**
+### isi soal
+
+Alyss adalah seorang gamer yang sangat menyukai bermain game Genshin Impact. Karena hobinya, dia ingin mengoleksi foto-foto karakter Genshin Impact. Suatu saat Yanuar memberikannya sebuah Link yang berisi koleksi kumpulan foto karakter dan sebuah clue yang mengarah ke penemuan gambar rahasia. Ternyata setiap nama file telah dienkripsi dengan menggunakan hexadecimal. Karena penasaran dengan apa yang dikatakan Yanuar, Alyss tidak menyerah dan mencoba untuk mengembalikan nama file tersebut kembali seperti semula.
+
+a. Alyss membuat script bernama awal.sh, untuk download file yang diberikan oleh Yanuar dan unzip terhadap file yang telah diunduh dan decode setiap nama file yang terenkripsi dengan hex . Karena pada file list_character.csv terdapat data lengkap karakter, Alyss ingin merename setiap file berdasarkan file tersebut. Agar semakin rapi, Alyss mengumpulkan setiap file ke dalam folder berdasarkan region tiap karakter
+* Format: Region - Nama - Elemen - Senjata.jp
+
+b. Karena tidak mengetahui jumlah pengguna dari tiap senjata yang ada di folder "genshin_character".Alyss berniat untuk menghitung serta menampilkan jumlah pengguna untuk setiap senjata yang ada
+* Format: [Nama Senjata] : [jumlah]
+	 Untuk menghemat penyimpanan. Alyss menghapus file - file yang tidak ia       gunakan, yaitu genshin_character.zip, list_character.csv, dan genshin.zip
+
+c. Namun sampai titik ini Alyss masih belum menemukan clue dari the secret picture yang disinggung oleh Yanuar. Dia berpikir keras untuk menemukan pesan tersembunyi tersebut. Alyss membuat script baru bernama search.sh untuk melakukan pengecekan terhadap setiap file tiap 1 detik. Pengecekan dilakukan dengan cara meng-ekstrak sebuah value dari setiap gambar dengan menggunakan command steghide. Dalam setiap gambar tersebut, terdapat sebuah file txt yang berisi string. Alyss kemudian mulai melakukan dekripsi dengan hex pada tiap file txt dan mendapatkan sebuah url. Setelah mendapatkan url yang ia cari, Alyss akan langsung menghentikan program search.sh serta mendownload file berdasarkan url yang didapatkan.
+
+d. Dalam prosesnya, setiap kali Alyss melakukan ekstraksi dan ternyata hasil ekstraksi bukan yang ia inginkan, maka ia akan langsung menghapus file txt tersebut. Namun, jika itu merupakan file txt yang dicari, maka ia akan menyimpan hasil dekripsi-nya bukan hasil ekstraksi. Selain itu juga, Alyss melakukan pencatatan log pada file image.log untuk setiap pengecekan gambar
+* Format: [date] [type] [image_path]
+* Ex:
+[24/03/20 17:18:19] [NOT FOUND] [image_path]
+
+[24/03/20 17:18:20] [FOUND] [image_path]
+
+e. Hasil akhir : 
+* genshin_character
+* search.sh
+* awal.sh
+* image.log
+* [filename].txt
+* [image].jpg
+
+### Penyelesaian
+**bagian 1 : mengunduh dan mengekstract data**
+
+     wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1oGHdTf4_76_RacfmQIV4i7os4sGwa9vN'>
+     unzip genshin.zip && unzip genshin_character.zip     
+
+**penjelasan code**
+
+     wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1oGHdTf4_76_RacfmQIV4i7os4sGwa9vN'
+- Perintah ini digunakan untuk mengunduh file genshin.zip dan genshin_character.zip dari Google Drive.
+
+      unzip genshin.zip && unzip genshin_character.zip
+* Perintah ini digunakan untuk mengekstrak file genshin.zip dan genshin_character.zip.
 
 
-### Kendala
-kendala untuk soal no 3 tidak selesai karena pada saat code sudah selesai, terjadi kendala dimana file yang sudah saya code hilang saat ingin mengupload ke github, sudah melaporkan kejadian ini di jam yang sama ke asisten ( mas adfi ) dan direncanakan untuk code ulang, tetapi pada saat itu waktu tidak memungkinkan untuk menyelesaikan tepat waktu.
+**Bagian 2: Menambahkan Nama Region, Elemen, dan Senjata ke Nama File Bash**
+
+     for file in *; do
+          decrypted_name=$(echo "$file" | xxd -p -r)
+          mv "$file" "$decrypted_name"
+          echo "File $file telah didekripsi dan diubah menjadi $decrypted_n>
+     done   
+     cd ..
+
+**penjelasan code**
+
+          for file in *; do
+* Perintah ini digunakan untuk iterasi melalui setiap file di direktori genshin_character.
+
+          decrypted_name=$(echo "$file" | xxd -p -r).
+* Perintah ini digunakan untuk mendekripsi nama file.
+
+          mv "$file" "$decrypted_name".
+* Perintah ini digunakan untuk mengganti nama file dengan nama yang didekripsi.
+
+          echo "File $file telah didekripsi dan diubah menjadi $decrypted_n>.
+* Perintah ini digunakan untuk mencetak pesan ke konsol.
+
+          cd ...
+* Perintah ini digunakan untuk berpindah ke direktori sebelumnya.
+
+
+          while IFS=, read -r Nama Region Element Senjata; do
+               Nama=$(echo "$Nama")
+               Region=$(echo "$Region")
+               Element=$(echo "$Element")
+               Senjata=$(echo "$Senjata")
+               new_name="$Region-$Nama-$Element-$Senjata"
+
+               if [ -e "genshin_character/$Nama" ];then
+                         mv "genshin_character/$Nama" "genshin_character/$new_nam>
+                         echo "File genshin_character/$Nama telah direname menjad>
+               else
+                         echo "File genshin_character/$Nama tidak ditemukan."
+               fi
+          done < list_character.csv
+
+          declare -A hitung_senjata
+
+
+          for file in genshin_character/*; do
+ 
+               Senjata=$(basename "$file" | awk -F' - ' '{print $(NF)}') #| awk -F'.>
+
+               if [[ -n "${hitung_senjata[$Senjata]}" ]]; then
+                    hitung_senjata[$Senjata]=$(( ${hitung_senjata[$Senjata]} + 1 ))
+               else
+                    hitung_senjata[$Senjata]=1
+               fi
+          done
+
+          for Senjata in "${!hitung_senjata[@]}"; do
+               echo "$Senjata : ${hitung_senjata[$Senjata]}"
+          done
+
+**penjelasan code**
+
+     while IFS=, read -r Nama Region Element Senjata; do.
+
+* Perintah ini digunakan untuk membaca file list_character.csv dan memisahkan setiap baris berdasarkan karakter setiap kolom disimpan dalam variabel Nama, Region, Element, dan Senjata.
+
+          Nama=$(echo "$Nama").
+* Perintah ini digunakan untuk membersihkan variabel Nama.
+
+          Region=$(echo "$Region").
+* Perintah ini digunakan untuk membersihkan variabel Region.
+
+          Element=$(echo "$Element").
+*Perintah ini digunakan untuk membersihkan variabel Element.
+
+          Senjata=$(echo "$Senjata").
+* Perintah ini digunakan untuk membersihkan variabel Senjata.
+
+          new_name="$Region-$Nama-$Element-$Senjata".
+* Perintah ini digunakan untuk membuat nama file baru dengan format Region-Nama-Elemen-Senjata.
+
+          if [ -e "genshin_character/$Nama" ];then.
+* Perintah ini digunakan untuk memeriksa apakah file dengan nama Nama ada di direktori genshin_character.
+
+          mv "genshin_character/$Nama" "genshin_character/$new_name".
+* Perintah ini digunakan untuk mengganti nama file Nama dengan new_name.
+
+          echo "File genshin_character/$Nama telah direname menjadi $new_name".
+* Perintah ini digunakan untuk mencetak pesan ke konsol.
+
+          else.
+* Perintah ini digunakan jika file dengan nama Nama tidak ada di direktori genshin_character.
+
+          echo "File genshin_character/$Nama tidak ditemukan.".
+* Perintah ini digunakan untuk mencetak pesan ke konsol.
+
+          done < list_character.csv.
+* Perintah ini digunakan untuk mengakhiri loop while dan membaca file selanjutnya di list_character.csv.
+
+          declare -A hitung_senjata.
+* Perintah ini digunakan untuk mendeklarasikan array asosiatif hitung_senjata untuk menyimpan jumlah pengguna setiap senjata.
+
+          for file in genshin_character/*; do.
+* Perintah ini digunakan untuk iterasi melalui setiap file di direktori genshin_character.
+
+          Senjata=$(basename "$file" | awk -F' - ' '{print $(NF)}') #| awk -F'.>.
+* Perintah ini digunakan untuk mengekstrak nama senjata dari nama file.
+
+          if [[ -n "${hitung_senjata[$Senjata]}" ]]; then.
+* Perintah ini digunakan untuk memeriksa apakah nama senjata sudah ada di array hitung_senjata.
+
+          hitung_senjata[$Senjata]=$(( ${hitung_senjata[$Senjata]} + 1 )).
+* Perintah ini digunakan untuk menambahkan 1 ke nilai hitung_senjata[$Senjata] jika nama senjata sudah ada di array.
+
+          else.
+* Perintah ini digunakan jika nama senjata belum ada di array hitung_senjata.
+
+          hitung_senjata[$Senjata]=1.
+* Perintah ini digunakan untuk menambahkan nama senjata ke array hitung_senjata dengan nilai 1.
+
+          fi.
+* Perintah ini digunakan untuk mengakhiri loop if.
+
+          done.
+* Perintah ini digunakan untuk mengakhiri loop for.
+
+
+
+**Bagian 5: Menampilkan Jumlah Pengguna Setiap Senjata**
+
+          for Senjata in "${!hitung_senjata[@]}"; do.
+* Perintah ini digunakan untuk iterasi melalui setiap elemen dalam array hitung_senjata.
+
+          echo "$Senjata : ${hitung_senjata[$Senjata]}".
+* Perintah ini digunakan untuk mencetak nama senjata dan jumlah penggunanya ke konsol.
+
+### kendala
+kendala untuk soal no 3 tidak selesai karena pada saat code sudah selesai, terjadi kendala dimana file yang sudah saya code hilang saat ingin mengupload ke github, sudah melaporkan kejadian ini di jam yang sama ke asisten ( mas adfi ) dan direncanakan untuk code ulang, tetapi pada saat itu waktu tidak memungkinkan untuk menyelesaikan tepat waktu5
+
 
 ## Soal 4
 
