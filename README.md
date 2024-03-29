@@ -225,7 +225,7 @@ e. Hasil akhir :
 * Perintah ini digunakan untuk membersihkan variabel Region.
 
           Element=$(echo "$Element").
-*Perintah ini digunakan untuk membersihkan variabel Element.
+* Perintah ini digunakan untuk membersihkan variabel Element.
 
           Senjata=$(echo "$Senjata").
 * Perintah ini digunakan untuk membersihkan variabel Senjata.
@@ -289,8 +289,7 @@ e. Hasil akhir :
 * Perintah ini digunakan untuk mencetak nama senjata dan jumlah penggunanya ke konsol.
 
 ### Kendala
-Kendala untuk soal no 3 tidak selesai karena pada saat code sudah selesai, terjadi kendala dimana file yang sudah saya code hilang saat ingin mengupload ke github, sudah melaporkan kejadian ini di jam yang sama ke asisten ( mas adfi ) dan direncanakan untuk code ulang, tetapi pada saat itu waktu tidak memungkinkan untuk menyelesaikan tepat waktu5
-
+Kendala yang saya alami dalam menyelesaikan soal nomor 3 adalah akibat kehilangan file yang telah selesai dikodekan saat hendak diunggah ke GitHub. Saya telah melaporkan insiden ini kepada asisten, Mas Adfi, pada waktu yang sama ketika kejadian terjadi. Meskipun telah direncanakan untuk melakukan kembali pengkodean, namun keterbatasan waktu menghalangi penyelesaian tepat waktu.
 
 ## Soal 4
 
