@@ -25,7 +25,7 @@ echo "Enter a security answer:" && read sec_a
 
 # Password check
 echo "Enter password:"
-echo "(>8 chars, 1 uppercase, 1 lowercase, 1 number, 1 symbol)"
+echo "(>8 chars, 1 uppercase, 1 lowercase, 1 number)"
 read -s pass
 while true; do
     if [[ ${#pass} -ge 8
