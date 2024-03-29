@@ -158,16 +158,239 @@ Enkripsi password yang telah dimasukkan sebelumnya dilakukan dengan command seba
 # Add base64 encryption
 encrypt=`echo $pass | base64`
 ```
-Setelah seluruh data terisi, maka hasil akan disimpan ke dalam sebuah file bernama `users.txt` yang berisi catatan seluruh user yang sudah dibuat.
+Setelah seluruh data terisi, maka hasil akan disimpan ke dalam sebuah file bernama `users.txt` yang berisi catatan seluruh user yang sudah dibuat. Segala keberhasilan/kegagalan juga dilaporkan kepada file `auth.log`.
 ```sh
 # Add to users.txt
 echo "$email:$uname:$sec_q:$sec_a:$encrypt" >> users.txt
 echo -e "\nREGISTRATION SUCCESSFUL!\nUse login.sh to enter your account.\n"
 echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER SUCCESS] user [$uname] register success" >> auth.log
 ```
+Berikut merupakan contoh isi `users.txt` :
+```
+test1@mail:Bob:date of birth:260907:RUxLQVNKRDIja2phZGYK
+test2@mail:John:favorite movie?:shrek:QUtKU0hkaGphc2RoJDQK
+test3@mail:Alex:favorite series?:Skibidi Toilet:NzdmZkpKYWtqc2RsZmgK
+zolguroth.thedestroyer99@mail:Zolguroth:where is the chicken:the oven:RUVGamRhZmg0NGYK
+test5@mail:Ann:favorite video game?:among us:YWtsc2RmamFzO2tkZmxqNDQqSAo=
+```
 
 ### login.sh
-**(work in progress)**
+Script berikutnya merupakan sebuah program login untuk para user yang sudah terdaftar. Hal pertama yang seorang pengguna akan lihat adalah interface login yang berisi 2 pilihan yang dibuat dengan menggunakan sistem menu angka switch case.
+```sh
+# Start program
+echo "Welcome to the Login Page. Please select an option:"
+echo "1. Login"
+echo "2. Forgot Password"
+echo "Choose an option: " && read locked
+
+# Select option
+case $locked in
+1) loginuser ;;
+2) i_forgor ;;
+*) echo "Invalid option" ;;
+esac
+```
+Fungsi utama dari script ini adalah `loginuser()` yang meminta email dan password yang terhubung dengan email (bila email ditemukan). 
+
+Saat sebuah email ditemukan, dilakukan enkripsi input dengan base64 untuk dibandingkan dengan hasil enkripsi yang tersimpan pada `users.txt` dan terdapat 3 cabang kejadian yang bisa terjadi:
+* Login berhasil -> fungsi member dipanggil
+* Login berhasil, email memiliki kata admin -> fungsi admin dipanggil
+* Login gagal -> keluar dari fungsi
+
+Semua kejadian tersebut akan tercatat pada `auth.log` sesuai dengan hasil yang terjadi dengan mencatat username yang didapat melalui `grep` dan `cut` untuk menghindari kejadian dengan `awk` field separator (:) yang dapat melakukan print dua email yang mengandung 2 substring yang sama.
+```sh
+loginuser() {
+    # Email check
+    echo "Enter your email:" && read email
+    if ! grep -q "^$email:" users.txt; then    
+        echo -e "\nEmail not found."
+        return 1
+    else
+        # Password check
+        echo "Enter password:" && read -s pass
+        uname=`grep "^$email:" users.txt | cut -d':' -f2`
+        encrypt=`echo $pass | base64`
+
+        # Admin login
+        if grep -q "^$email:.*:.*:.*:$encrypt" users.txt && echo "$email" | grep -q "admin"; then
+                echo -e "\nLogin successful\n"
+                echo "$(date '+[%d/%m/%y %H:%M:%S]') [LOGIN SUCCESS] user [$uname] login success" >> auth.log
+                admin
+        # Member login
+        elif grep -q "^$email:.*:.*:.*:$encrypt" users.txt; then
+                echo -e "\nLogin successful\n"
+                echo "$(date '+[%d/%m/%y %H:%M:%S]') [LOGIN SUCCESS] user [$uname] login success" >> auth.log
+                member
+        # Fail login
+        else
+                echo -e "\nPassword is incorrect. Please enter the correct password."
+                echo "$(date '+[%d/%m/%y %H:%M:%S]') [LOGIN FAILED] ERROR Failed login attempt on user with email [$email]" >> auth.log
+                return 1  
+        fi
+    fi
+}
+```
+Berikut adalah isi dari fungsi member yang dapat diubah sesuai keperluan:
+```sh
+member() {
+    # Welcome message
+    echo -e "\nWelcome! You have member privileges.\n"
+    return 0
+}
+```
+Berikutnya terdapat sebuah fungsi yang berfungsi untuk menampilkan password suatu user bila **berhasil menjawab security question** yang sudah dibuat saat registrasi. 
+
+Menggunakan sistem pencarian email yang sama dengan fungsi sebelumnya, fungsi ini menampilkan security question dari email yang tersedia melalui `grep` dan `cut`.
+
+Bila security question terjawab dengan benar, maka password akan dilakukan dekripsi dari base64 menjadi karakter yang sesuai awal dan ditampilkan kepada pengguna.
+```sh
+i_forgor() {
+    # Email check
+    echo "Enter your email:" && read email
+    if ! grep -q "^$email:" users.txt; then    
+        echo -e "\nEmail not found."
+        return 1
+    else
+        # Grab security question
+        sec_q=`grep "^$email:" users.txt | cut -d':' -f3`
+        echo "Security question: $sec_q"
+        # Sec_q check
+        echo "Enter your answer:" && read sec_a
+        if ! grep -q "^$email:.*:.*:$sec_a" users.txt; then
+            echo -e "\nIncorrect answer."
+            return 1
+        else
+            encrypt=`grep "^$email:" users.txt | cut -d':' -f5`
+            pass=`echo $encrypt | base64 -d`
+            echo -e "\nYour password is: $pass\n"
+        fi
+    fi
+}
+```
+Fungsi berikutnya adalah menu admin yang hanya dapat diakses ketika email yang telah diregistrasi memiliki kata admin. Menggunakan sistem menu angka switch case yang sama seperti yang telah dibuat sebelumnya, seorang admin dapat memilih untuk add user, edit user, ataupun delete user.
+
+Fungsi ini juga akan mengulang dirinya sendiri bila input tidak sesuai, dan dari ketiga fungsi admin yang tersedia, semua diakhiri dengan fungsi admin agar dapat melakukan beberapa perintah admin secara berturut-turut hingga selesai pekerjaan yang diperlukan.
+```sh
+admin() {
+    # Start admin menu
+    echo -e "\nWelcome! You have admin privileges."
+    echo "Admin Menu"
+    echo "1. Add User"
+    echo "2. Edit User"
+    echo "3. Delete User"
+    echo "4. Exit"
+    
+    echo -e "\nChoose an option: "
+    read locked
+
+    # Select option
+    case $locked in
+    1) adduser ;;
+    2) edituser ;;
+    3) deleteuser ;;
+    4) echo "Exiting..."
+        exit 0 ;;
+    *) echo "Invalid option"
+        admin ;;
+    esac
+    
+    return 0
+}
+```
+Fungsi admin pertama merupakan `adduser()` yang merupakan hal yang identik dengan script `login.sh`
+```sh
+adduser() {
+    # Email check
+    echo "Enter your email:" && read email
+    if echo "$email" | grep -vo "@"; then
+        echo -e "\nPlease enter a valid email."
+        echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Invalid email": [$email]" >> auth.log
+        return 1
+    fi
+    if grep -q "^$email:.*:.*:.*:.*" users.txt; then
+        echo -e "\nEmail already exists. Please choose a different one."
+        echo "$(date '+[%d/%m/%y %H:%M:%S]') [REGISTER FAILED] ERROR Failed register attempt with error: "Email already exists": [$email]" >> auth.log
+        return 1
+    fi
+
+    # Username input
+    echo "Enter your username:" && read uname
+
+    # Security question
+    echo "Enter a security question:" && read sec_q
+    echo "Enter a security answer:" && read sec_a
+
+    # Password check
+    echo -e "Enter password:\n(min 8 chars, 1 uppercase, 1 lowercase, 1 digit)"
+    read -s pass
+    while true; do
+        if [[ ${#pass} -ge 8
+            && "$pass" == *[[:lower:]]*
+            && "$pass" == *[[:upper:]]*
+            && "$pass" == *[0-9]* ]]; then
+            break
+        else
+            echo "Password does not meet the requirements"
+            echo "Enter password:"
+            read -s pass
+        fi
+    done
+
+    # Add base64 encryption
+    encrypt=`echo $pass | base64`
+
+    # Add to users.txt
+    echo "$email:$uname:$sec_q:$sec_a:$encrypt" >> users.txt
+    echo -e "\nAdd successful.\n " && admin
+}
+```
+Fungsi admin kedua merupakan `edituser()` yang digunakan untuk membuat ulang isi data sebuah email sesuai keperluan. Menggunakan sistem pencarian email yang sama dengan fungsi sebelumnya, admin dapat mengubah seluruh data pada sebuah user dan bahkan melanggar peraturan password. Pembaharuan data digunakan dengan cara perintah `c` (change) dari `sed` pada baris yang sesuai email yang dimasukkan.
+```sh
+edituser () {
+    # Email check
+    echo "Enter your email:" && read email
+    if ! grep -q "^$email:" users.txt; then    
+        echo -e "\nEmail not found."
+        return 1
+    else
+        # Add new data
+        echo "Enter new username:" && read new_uname
+        echo "Enter new security question:" && read new_sec_q
+        echo "Enter new security answer:" && read new_sec_a
+        echo "Enter new password:" && read -s new_pass #Admins can break password rules
+        newencrypt=`echo $new_pass | base64`
+
+        # Replace old data
+        sed -i "/^$email:/c\\$email:$new_uname:$new_sec_q:$new_sec_a:$newencrypt" users.txt
+        echo -e "\nEdit successful.\n" && admin
+    fi
+}
+```
+Fungsi admin terakhir merupakan `deleteuser()` yang digunakan untuk menghilangkan user dari email yang disebut. Menggunakan sistem pencarian email yang sama dengan fungsi sebelumnya, menghapus satu user dengan cara perintah `d` (delete) dari `sed` pada baris yang sesuai email yang dimasukkan.
+```sh
+deleteuser () {
+    # Email check
+    echo "Enter your email:" && read email
+    if ! grep -q "^$email:" users.txt; then    
+        echo -e "\nEmail not found."
+        return 1
+    else
+        # Delete selected account
+        sed -i "/^$email:/d" users.txt
+        echo -e "\nDelete successful.\n" && admin
+    fi
+}
+```
+Semua percobaan login dan register, baik berhasil atau gagal, tercatat ke dalam sebuah file `auth.log`, berikut adalah contoh log yang dibuat:
+```log
+[29/03/24 22:48:37] [REGISTER SUCCESS] user [sus] register success
+[29/03/24 22:49:10] [REGISTER SUCCESS] user [adminsus] register success
+[30/03/24 00:16:12] [LOGIN FAILED] ERROR Failed login attempt on user with email [sus@among]
+[30/03/24 00:16:36] [LOGIN SUCCESS] user [sus] login success
+[30/03/24 00:17:47] [REGISTER FAILED] ERROR Failed register attempt with error: Invalid email: [sus]
+[30/03/24 00:17:53] [REGISTER FAILED] ERROR Failed register attempt with error: Email already exists: [sus@among]
+```
+
 
 ### Kendala
 Tidak ada kendala.
