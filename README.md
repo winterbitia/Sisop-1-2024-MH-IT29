@@ -5,6 +5,9 @@
 - Malvin Putra Rismahardian (5027231048)
 
 ## Soal 1
+
+**Dikerjakan oleh : Dian Anggraeni Putri (5027231016)**
+
 Pertama, saya menggunakan perintah wget untuk mengunduh file "Sandbox.csv" dari Google Drive. Dalam perintah tersebut, saya menggunakan opsi --no-check-certificate untuk mendownload tanpa memeriksa sertifikat SSL, sehingga mempercepat proses download. Saya juga menggunakan opsi -O untuk mengontrol nama file yang akan didownload, yaitu dengan nama "Sandbox.csv".
 ```shell
 wget --no-check-certificate 'https://drive.google.com/uc?export=download&id=1cC6MYBI3wRwDgqlFQE1OQUN83JAreId0' -O Sandbox.csv
@@ -90,6 +93,73 @@ grep 'Adriaens' Sandbox.csv | awk -F ',' '{print $2, $6, $17}'
 ### Kendala
 Tidak ada kendala.
 
+## Soal 2
+
+**Dikerjakan oleh : Amoes Noland (5027231028)**
+
+### register.sh
+**(work in progress)**
+
+### login.sh
+**(work in progress)**
+
+### Kendala
+Tidak ada kendala.
+
 ## Soal 3
-## kendala
+
+**Dikerjakan oleh : Malvin Putra Rismahardian (5027231048)**
+
+
+### Kendala
 kendala untuk soal no 3 tidak selesai karena pada saat code sudah selesai, terjadi kendala dimana file yang sudah saya code hilang saat ingin mengupload ke github, sudah melaporkan kejadian ini di jam yang sama ke asisten ( mas adfi ) dan direncanakan untuk code ulang, tetapi pada saat itu waktu tidak memungkinkan untuk menyelesaikan tepat waktu.
+
+## Soal 4
+
+**Dikerjakan oleh : Amoes Noland (5027231028)**
+
+Di dalam soal nomor 4, kita disuruh untuk membuat program untuk monitoring RAM dan penggunaan disk pada home user directory. Terdapat dua script yang digunakan, `minute_log.sh` yang berjalan setiap menit untuk mencatat data, dan `aggregate_minutes_to_hourly_log.sh` yang berjalan setiap jam untuk menyimpulkan data yang sudah tercatat.
+
+### minute_log.sh
+Untuk memperoleh data mentah penggunaan RAM dan disk, digunakan beberapa perintah yang sudah disebut dalam modul, dan akan tersimpan dalam sebuah satu file text sementara, sehingga bisa dimanipulasi untuk pembuatan log. 
+```sh
+# extracting memory usage to a temporary text file
+free -m > temp.txt
+
+# extracting disk usage from the user home directory to THE temporary text file
+user=`whoami` && du -sh /home/$user >> temp.txt
+```
+Contoh file **temp.txt** yang terbuat adalah sebagai berikut:
+```
+               total        used        free      shared  buff/cache   available
+Mem:           15413        5022        8122          66        2663       10391
+Swap:              0           0           0
+18G	/home/winter
+```
+Hal berikutnya yang harus dilakukan adalah untuk menampilkan hasil pengambilan data mentah penggunaan RAM dan disk ke dalam sebuah log file yang sudah tertulis secara rapi. Ini dilakukan dengan cara mengambil data dari `temp.txt` yang sesuai dengan jenis data yang ingin dicatat melalui fungsi print `awk` pada setiap kolom yang relevan.
+
+Semua hasil print digabung dalam satu baris menggunakan fungsi `paste` dan semua tulisan disimpan dalam sebuah log file yang sesuai format yang diminta dengan mengambil data tanggal/waktu menggunakan `date`.
+```sh
+# print results using echo and awk
+echo "mem_total,mem_used,mem_free,mem_shared,mem_buff,mem_available,swap_total,swap_used,swap_free,path,path_size" > /home/$user/log/"metrics_$(date +"%Y%m%d%H%M%S").log"
+awk '/Mem/ {print $2","$3","$4","$5","$6","$7","};
+     /Swa/ {print $2","$3","$4","};
+     /home/ {print $2","$1}
+     ' temp.txt | paste -s -d '' >> /home/$user/log/"metrics_$(date +"%Y%m%d%H%M%S").log"
+```
+Contoh file **metrics_\*.log** yang dihasilkan adalah sebagai berikut:
+```log
+mem_total,mem_used,mem_free,mem_shared,mem_buff,mem_available,swap_total,swap_used,swap_free,path,path_size
+15413,5814,5814,65,4179,9599,5000,0,5000,/home/winter,18G
+```
+Script ini akan berjalan setiap menit bila menggunakan sistem Cron Jobs yang dilakukan dengan mengubah file crontab dengan cara `crontab -e` untuk memanggil script yang sudah dibuat melalui directory lengkap. Contohnya adalah sebagai berikut:
+```
+* * * * * /home/winter/Documents/ITS/SISOP/Modul1/soal_4/minute_log.sh
+```
+
+### aggregate_minutes_to_hourly_log.sh
+**(work in progress)**
+
+
+### Kendala
+Tidak ada kendala.
