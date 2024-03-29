@@ -329,14 +329,103 @@ Contoh file **metrics_\*.log** yang dihasilkan adalah sebagai berikut:
 mem_total,mem_used,mem_free,mem_shared,mem_buff,mem_available,swap_total,swap_used,swap_free,path,path_size
 15413,5814,5814,65,4179,9599,5000,0,5000,/home/winter,18G
 ```
-Script ini akan berjalan setiap menit bila menggunakan sistem Cron Jobs yang dilakukan dengan mengubah file crontab dengan cara `crontab -e` untuk memanggil script yang sudah dibuat melalui directory lengkap. Contohnya adalah sebagai berikut:
+
+Untuk memastikan bahwa file log hanya dapat dilihat oleh pemilik, maka semua permission dari *group* dan *others* harus dihilangkan. Selain itu, untuk menutup script, akan dilakukan delete `temp.txt` agar directory milik script dapat menjadi lebih bersih.
+```sh
+# manage permissions
+chmod go-rwx "/home/$user/log/""metrics_$(date +"%Y%m%d%H%M%S").log"    
+
+# delete the temporary text file
+rm temp.txt
+```
+Script ini akan berjalan setiap menit bila menggunakan sistem Cron Jobs dengan setting **at every minute (\* \* \* \* \*)**, yang dilakukan dengan mengubah file crontab dengan cara `crontab -e` untuk memanggil script yang sudah dibuat melalui directory lengkap. Contohnya adalah sebagai berikut:
 ```
 * * * * * /home/winter/Documents/ITS/SISOP/Modul1/soal_4/minute_log.sh
 ```
 
 ### aggregate_minutes_to_hourly_log.sh
-**(work in progress)**
+Untuk membuat agregasi file log setiap jam, pertama diperlukan mencari semua file log dalam tersimpan dalam folder log sesuai ketentuan. Kode akan mengambil semua file log dengan filter:
+* Dibuat **1 jam yang lalu**
+* Tidak memiliki kata **agg**
 
+Dari semua file log yang ditemukan, akan diambil seluruh data angkanya menggunakan `awk` dengan field separator tanda koma. Setelah itu, dilakukan konversi ukuran disk menggunakan `numfmt` agar tidak terjadi kasus dimana **900M > 1G** saat dilakukan perbandingan angka. Semua data yang ditemukan akan diprint ke dalam sebuah file text sementara khusus yang dinamakan `temphour.txt` untuk penggunaan lebih lanjut.
+```sh
+# find all log files located in the log folder
+user=`whoami`
+range=`date -d '-1 hour' +%Y%m%d%H`
+find /home/$user/log -name "*$range*" -not -name '*_agg_*' -exec awk -F "," 'END{cmd=sprintf("numfmt --from=iec %s",$11); cmd | getline conv; close(cmd); print $0","  conv}' {} \; > temphour.txt 
+```
+Berikut adalah 5 baris contoh `temphour.txt` yang dihasilkan dari kode di atas:
+```
+15413,5751,7332,101,2760,9661,5000,0,5000,/home/winter,19G,20401094656
+15413,5745,7337,101,2760,9667,5000,0,5000,/home/winter,19G,20401094656
+15413,5776,7307,99,2758,9637,5000,0,5000,/home/winter,19G,20401094656
+15413,5759,7323,101,2760,9653,5000,0,5000,/home/winter,19G,20401094656
+15413,5804,7279,101,2760,9608,5000,0,5000,/home/winter,19G,20401094656
+```
+Hal berikutnya yang harus dilakukan adalah mulai memproses hasil pengambilan data yang sudah tersimpan dalam `temphour.txt` dengan menyimpan variabel menggunakan ternary conditional dalam berbagai command `awk` sehingga dapat ditemukan variabel minimum dan maximum dari setiap kolom. Setelah itu, hasil yang sudah terhitung disimpan dalam sebuah log file khusus yang sesuai format yang diminta dengan mengambil data tanggal/waktu menggunakan `date`.
+```sh
+# create the hourly log file
+echo "type,mem_total,mem_used,mem_free,mem_shared,mem_buff,mem_available,swap_total,swap_used,swap_free,path,path_size" > /home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log"
+    # minimum
+awk -F "," '(NR==1){t = $1} {t = $1<t ? $1:t}  END{print "minimum,"t","}
+            (NR==1){a = $2} {a = $2<a ? $2:a}  END{print a","}
+            (NR==1){b = $3} {b = $3<b ? $3:b}  END{print b","}
+            (NR==1){c = $4} {c = $4<c ? $4:c}  END{print c","}
+            (NR==1){d = $5} {d = $5<d ? $5:d}  END{print d","}
+            (NR==1){e = $6} {e = $6<e ? $6:e}  END{print e","}
+            (NR==1){f = $7} {f = $7<f ? $7:f}  END{print f","}
+            (NR==1){g = $8} {g = $8<g ? $8:g}  END{print g","}
+            (NR==1){h = $9} {h = $9<h ? $9:h}  END{print h","$10","}
+            (NR==1){m = $12}{m = $12<m ? $12:m}END{cmd=sprintf("numfmt --to=iec %d",m); cmd | getline conv; close(cmd); print conv}
+            ' temphour.txt | paste -s -d '' >> /home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log"
+    # maximum
+awk -F "," '(NR==1){t = $1} {t = $1>t ? $1:t}  END{print "maximum,"t","}
+            (NR==1){a = $2} {a = $2>a ? $2:a}  END{print a","}
+            (NR==1){b = $3} {b = $3>b ? $3:b}  END{print b","}
+            (NR==1){c = $4} {c = $4>c ? $4:c}  END{print c","}
+            (NR==1){d = $5} {d = $5>d ? $5:d}  END{print d","}
+            (NR==1){e = $6} {e = $6>e ? $6:e}  END{print e","}
+            (NR==1){f = $7} {f = $7>f ? $7:f}  END{print f","}
+            (NR==1){g = $8} {g = $8>g ? $8:g}  END{print g","}
+            (NR==1){h = $9} {h = $9>h ? $9:h}  END{print h","$10","}
+            (NR==1){m = $12}{m = $12>m ? $12:m}END{cmd=sprintf("numfmt --to=iec %d",m); cmd | getline conv; close(cmd); print conv}
+            ' temphour.txt | paste -s -d '' >> /home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log"
+```
+Selain itu, juga diperlukan untuk memproses semua log file yang dicari untuk mencari nilai rata-rata masing-masing kolom, hal ini dilakukan menggunakan `awk` dengan cara membagi total kolom dengan jumlah baris pada kolom. Selain itu juga dilakukan konversi nilai disk seperti bagian sebelumnya untuk perhitungan yang benar dari disk size. Setelah itu, hasil yang sudah terhitung disimpan juga dalam sebuah log file yang sama.
+```sh
+# average
+awk -F "," '{t+=$1}  END{print "average,"t/NR","}
+            {a+=$2}  END{print a/NR","}
+            {b+=$3}  END{print b/NR","}
+            {c+=$4}  END{print c/NR","}
+            {d+=$5}  END{print d/NR","}
+            {e+=$6}  END{print e/NR","}
+            {f+=$7}  END{print f/NR","}
+            {g+=$8}  END{print g/NR","}
+            {h+=$9}  END{print h/NR","$10","}
+            {m+=$12} END{cmd=sprintf("numfmt --to=iec %d",m/NR); cmd | getline conv; close(cmd); print conv}
+            ' temphour.txt | paste -s -d '' >> /home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log"
+```
+Contoh file **metrics_agg_\*.log** yang dihasilkan adalah sebagai berikut:
+```log
+type,mem_total,mem_used,mem_free,mem_shared,mem_buff,mem_available,swap_total,swap_used,swap_free,path,path_size
+minimum,15413,5472,7279,99,2614,9608,0,0,0,/home/winter,19G
+maximum,15413,5804,7764,153,2783,9940,5000,0,5000,/home/winter,19G
+average,15413,5628.2,7481.3,126.2,2754.1,9784,2500,0,2500,/home/winter,19G
+```
+Untuk memastikan bahwa file log hanya dapat dilihat oleh pemilik, maka semua permission dari *group* dan *others* harus dihilangkan. Selain itu, untuk menutup script, akan dilakukan delete `temphour.txt` agar directory milik script dapat menjadi lebih bersih.
 
+```sh
+# manage permissions
+chmod go-rwx "/home/$user/log/"metrics_agg_$(date +"%Y%m%d%H").log""
+
+# delete the temporary text file
+rm temphour.txt
+```
+Script ini akan berjalan setiap jam bila menggunakan sistem Cron Jobs dengan setting **at hour 0 (0 \* \* \* \*)**, dilakukan dengan mengubah file crontab dengan cara `crontab -e` untuk memanggil script yang sudah dibuat melalui directory lengkap. Contohnya adalah sebagai berikut:
+```
+0 * * * * /home/winter/Documents/ITS/SISOP/Modul1/soal_4/aggregate_minutes_to_hourly_log.sh
+```
 ### Kendala
 Tidak ada kendala.

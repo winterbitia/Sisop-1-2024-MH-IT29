@@ -1,0 +1,16 @@
+[25/03/24 17:32:08] [REGISTER SUCCESS] user [John Winter] register success
+[25/03/24 18:35:41] [LOGIN FAILED] ERROR Failed login attempt on user with email [sus@among]
+[25/03/24 18:49:32] [LOGIN FAILED] ERROR Failed login attempt on user with email [sus@among]
+[25/03/24 18:49:44] [LOGIN SUCCESS] user [] login success
+[25/03/24 18:52:43] [REGISTER SUCCESS] user [John Admin Winter] register success
+[25/03/24 18:57:34] [LOGIN SUCCESS] user [John Admin Winter] login success
+[25/03/24 18:58:16] [LOGIN FAILED] ERROR Failed login attempt on user with email [sus@among]
+[25/03/24 18:58:30] [LOGIN FAILED] ERROR Failed login attempt on user with email [sus@among]
+[25/03/24 18:58:44] [LOGIN SUCCESS] user [] login success
+[25/03/24 19:25:30] [LOGIN SUCCESS] user [John Winter
+John Admin Winter] login success
+[25/03/24 19:35:05] [LOGIN SUCCESS] user [John Admin Winter] login success
+[25/03/24 19:36:37] [LOGIN SUCCESS] user [John Admin Winter] login success
+[25/03/24 19:37:38] [LOGIN SUCCESS] user [John Admin Winter] login success
+[25/03/24 19:38:32] [LOGIN SUCCESS] user [John Admin Winter] login success
+[25/03/24 19:40:27] [LOGIN SUCCESS] user [John Admin Winter] login success
