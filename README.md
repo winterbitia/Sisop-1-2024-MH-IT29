@@ -138,12 +138,12 @@ e. Hasil akhir :
 * [image].jpg
 
 ### Penyelesaian
-**bagian 1 : mengunduh dan mengekstract data**
+**Bagian 1 : Mengunduh dan mengekstract data**
 
      wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1oGHdTf4_76_RacfmQIV4i7os4sGwa9vN'>
      unzip genshin.zip && unzip genshin_character.zip     
 
-**penjelasan code**
+**Penjelasan code**
 
      wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1oGHdTf4_76_RacfmQIV4i7os4sGwa9vN'
 - Perintah ini digunakan untuk mengunduh file genshin.zip dan genshin_character.zip dari Google Drive.
@@ -161,7 +161,7 @@ e. Hasil akhir :
      done   
      cd ..
 
-**penjelasan code**
+**Penjelasan code**
 
           for file in *; do
 * Perintah ini digunakan untuk iterasi melalui setiap file di direktori genshin_character.
@@ -212,7 +212,7 @@ e. Hasil akhir :
                echo "$Senjata : ${hitung_senjata[$Senjata]}"
           done
 
-**penjelasan code**
+**Penjelasan code**
 
      while IFS=, read -r Nama Region Element Senjata; do.
 
@@ -288,8 +288,8 @@ e. Hasil akhir :
           echo "$Senjata : ${hitung_senjata[$Senjata]}".
 * Perintah ini digunakan untuk mencetak nama senjata dan jumlah penggunanya ke konsol.
 
-### kendala
-kendala untuk soal no 3 tidak selesai karena pada saat code sudah selesai, terjadi kendala dimana file yang sudah saya code hilang saat ingin mengupload ke github, sudah melaporkan kejadian ini di jam yang sama ke asisten ( mas adfi ) dan direncanakan untuk code ulang, tetapi pada saat itu waktu tidak memungkinkan untuk menyelesaikan tepat waktu5
+### Kendala
+Kendala untuk soal no 3 tidak selesai karena pada saat code sudah selesai, terjadi kendala dimana file yang sudah saya code hilang saat ingin mengupload ke github, sudah melaporkan kejadian ini di jam yang sama ke asisten ( mas adfi ) dan direncanakan untuk code ulang, tetapi pada saat itu waktu tidak memungkinkan untuk menyelesaikan tepat waktu5
 
 
 ## Soal 4
