@@ -22,7 +22,7 @@ adduser() {
     echo "Enter a security answer:" && read sec_a
 
     # Password check
-    echo -e "Enter password:\n(min 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 symbol)"
+    echo -e "Enter password:\n(min 8 chars, 1 uppercase, 1 lowercase, 1 digit)"
     read -s pass
     while true; do
         if [[ ${#pass} -ge 8
