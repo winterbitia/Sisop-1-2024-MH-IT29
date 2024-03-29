@@ -119,7 +119,7 @@ loginuser() {
     else
         # Password check
         echo "Enter password:" && read -s pass
-        uname=`awk -F: -v email=$email '$0~email {print $2}' users.txt`
+        uname=`grep "^$email:" users.txt | cut -d':' -f2`
         encrypt=`echo $pass | base64`
 
         # Admin login
