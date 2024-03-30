@@ -611,6 +611,80 @@ e. Hasil akhir :
           echo "$Senjata : ${hitung_senjata[$Senjata]}".
 * Perintah ini digunakan untuk mencetak nama senjata dan jumlah penggunanya ke konsol.
 
+
+## Search.sh
+Script berikutnya adalah untuk mencari link tersembunyi di balik foto-foto yang telah di rename sebelumnya. sehingga, untuk lognya adalah
+```sh
+#!/bin/bash
+
+# Fungsi untuk menangani pesan tersembunyi yang ditemukan
+handle_found_message() {
+    local image="$1"
+    local url=$(xxd -p -c 9999 secret.txt | tr -d '\n' | xxd -r -p)
+    echo "[$(date +'%d/%m/%y %H:%M:%S')] [FOUND] [$image]" >> image.log
+    echo "URL yang ditemukan: $url"
+    # Download file berdasarkan URL yang ditemukan
+    wget "$url"
+    exit 0
+}
+
+# Loop tak terbatas untuk mencari pesan tersembunyi
+while true; do
+    # Iterasi melalui setiap file gambar jpg
+    for image in *.jpg; do
+        # Ekstraksi pesan tersembunyi dari file gambar
+        steghide extract -sf "$image" &> /dev/null
+
+        # Periksa apakah ekstraksi berhasil
+        if [ $? -eq 0 ]; then
+            # Jika berhasil, periksa apakah file secret.txt ada
+            if [ -f "secret.txt" ]; then
+                # Jika secret.txt ada, panggil fungsi untuk menangani pesan tersembunyi yang ditemukan
+                handle_found_message "$image"
+            else
+                # Jika secret.txt tidak ada, hapus file yang tidak diinginkan dan catat pesan penolakan
+                rm -f secret.txt
+                echo "[$(date +'%d/%m/%y %H:%M:%S')] [REJECTED] [secret.txt]" >> image.log
+            fi
+        else
+            # Jika ekstraksi gagal, catat pesan bahwa pesan tersembunyi tidak ditemukan
+            echo "[$(date +'%d/%m/%y %H:%M:%S')] [NOT FOUND] [$image]" >> image.log
+        fi
+    done
+    # Tunggu 1 detik sebelum iterasi berikutnya
+    sleep 1
+done
+```
+
+Skrip bash di atas bertanggung jawab untuk mendeteksi dan mengekstraksi pesan tersembunyi dari file gambar dalam format .jpg. Berikut adalah penjelasan garis besar mengenai kegunaan skrip tersebut:
+
+	handle_found_message():
+
+* Fungsi ini digunakan untuk menangani pesan tersembunyi yang berhasil ditemukan dalam file gambar.
+Ketika pesan tersembunyi berhasil diekstraksi, fungsi ini mencatat waktu, nama file gambar, dan URL yang ditemukan dalam file image.log.
+Setelah itu, fungsi ini mengunduh file yang terhubung dengan URL tersebut.
+
+**Loop Tak Terbatas:**
+* Skrip ini berjalan dalam sebuah loop tak terbatas menggunakan konstruksi _while true; do ... done._
+Ini memastikan bahwa proses pencarian pesan tersembunyi akan terus berjalan hingga skrip dihentikan secara manual.
+
+**Iterasi melalui Setiap File Gambar:**
+* Skrip melakukan iterasi melalui setiap file gambar dalam direktori saat ini dengan ekstensi .jpg.
+
+**Ekstraksi Pesan Tersembunyi:**
+* Menggunakan perintah steghide, skrip mencoba mengekstraksi pesan tersembunyi dari setiap file gambar.
+Output dari perintah ini disalurkan ke /dev/null agar tidak ditampilkan di layar.
+
+**Penanganan Hasil Ekstraksi:**
+* Jika ekstraksi berhasil, skrip akan memeriksa keberadaan file secret.txt.
+Jika secret.txt ditemukan, fungsi handle_found_message() akan dipanggil untuk menangani pesan tersembunyi yang ditemukan.
+Jika secret.txt tidak ditemukan, skrip akan menghapus file yang tidak diinginkan dan mencatat pesan penolakan dalam image.log.
+
+**Pencatatan Pesan dan Tunggu 1 Detik:**
+* Setelah proses penanganan file selesai, skrip akan mencatat hasil pencarian dalam image.log.
+Skrip kemudian akan menunggu selama 1 detik sebelum melakukan iterasi berikutnya.
+Dengan cara ini, skrip tersebut secara otomatis memeriksa setiap file gambar dalam format .jpg untuk mendeteksi dan mengekstraksi pesan tersembunyi, dan kemudian melakukan tindakan yang sesuai berdasarkan hasil ekstraksi tersebut.
+
 ### Kendala
 Kendala yang saya alami dalam menyelesaikan soal nomor 3 adalah akibat kehilangan file yang telah selesai dikodekan saat hendak diunggah ke GitHub. Saya telah melaporkan insiden ini kepada asisten, Mas Adfi, pada waktu yang sama ketika kejadian terjadi. Meskipun telah direncanakan untuk melakukan kembali pengkodean, namun keterbatasan waktu menghalangi penyelesaian tepat waktu.
 
