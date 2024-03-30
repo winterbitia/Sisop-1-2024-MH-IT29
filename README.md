@@ -93,8 +93,7 @@ grep 'Adriaens' Sandbox.csv | awk -F ',' '{print $2, $6, $17}'
 ### Kendala
 Tidak ada kendala.
 ### Revisi
-Pada bagian 1b terjadi kesalahan dalam menampilkan informasi yang seharusnya menampilkan customer segment namun malah menampilkan nama pelanggan. Untuk memperbaiki kesalahan ini, saya telah merevisi kode yang saya gunakan. Dengan cara mengganti bagian $6 yaitu kolom nama pelanggan menjadi $7 yaitu kolom customer segment.
-Pada bagian 1b, otput saya salah menampilkan nama pelanggan yang seharusnya saya harus menampilkan customer segment. Berikut ini adalah perbaikan kode saya beserta penjelasan rinci setiap kodenya yang saya lampirkan dalam komentar:
+Pada bagian 1b terjadi kesalahan dalam menampilkan informasi yang seharusnya menampilkan customer segment namun malah menampilkan nama pelanggan. Untuk memperbaiki kesalahan ini, saya telah merevisi kode yang saya gunakan. Dengan cara mengganti bagian $6 yaitu kolom nama pelanggan menjadi $7 yaitu kolom customer segment. Berikut ini adalah perbaikan kode saya beserta penjelasan rinci setiap kodenya yang saya lampirkan dalam komentar:
  ```sh
 echo Menampilkan customer segment atau pelanggan yang memiliki profit paling kecil.
 awk -F ',' 'NR > 1 {profits[$6] += $20; if (profits[$6] < min_profit || min_profit == "") min_profit = profits[$6]} END {for (buyer in profits) if (profits[buyer] == min_profit) print buyer, profits[buyer]}' Sandbox.csv
