@@ -53,7 +53,7 @@ awk -F ',' 'NR > 1 {profits[$6] += $20; if (profits[$6] < min_profit || min_prof
 ### 1c
 Saya menggunakan perintah `awk` untuk menganalisis file "Sandbox.csv" yang berisi data penjualan. Tujuannya adalah untuk mengidentifikasi tiga kategori dengan total profit paling tinggi. Selama proses, saya mengumpulkan total profit untuk setiap kategori dalam array `profits`. Setelah seluruh file diproses, saya mengatur pengurutan kategori berdasarkan profit dalam urutan menurun, dan kemudian saya memilih tiga kategori teratas dengan total profit tertinggi. Jika sudah ada tiga kategori teratas yang teridentifikasi, saya memeriksa apakah profit kategori saat ini lebih tinggi daripada yang paling rendah di antara tiga kategori teratas. Jika ya, saya menggantinya dengan kategori saat ini. Dengan demikian, hasil akhirnya adalah menampilkan nama kategori dan total profitnya untuk tiga kategori teratas tersebut. Berikut ini adalah kode saya beserta penjelasan rinci setiap kodenya yang saya lampirkan dalam komentar:
  ```sh
-echo Menampilkan 3 kategori yang memiliki total profit paling tinggi
+echo Menampilkan 3 kategori yang memiliki total profit paling tinggi.
 awk -F ',' 'NR > 1 {profits[$14] += $20} END {PROCINFO["sorted_in"] = "@val_num_desc"; count = 0; for (category in profits) { if (count < 3) { top_categories[category] = profits[category]; count++; } else { for (top in top_categories) { if (profits[category] > top_categories[top]) { delete top_categories[top]; top_categories[category] = profits[category]; break; } } } } for (category in top_categories) print category, top_categories[category] }' Sandbox.csv
 
 # -F ',': menetapkan pemisah antar kolom.
@@ -105,6 +105,8 @@ awk -F ',' 'NR > 1 { if (min_profit == "" || $20 < min_profit) { min_profit = $2
 # END: penanda blok kode yang akan dijalankan setelah semua baris diproses.
 # print min_segment, min_profit: perintah menampilkan customer segment dengan profit terkecil.
 ```
+### Hasil Akhir
+![alt text](https://cdn.discordapp.com/attachments/1149170089590001815/1223517604778606712/Screenshot_1536.png?ex=661a2490&is=6607af90&hm=8a5db21aca09a0ff138cd252a40e4d9282f63f22b424983e467d4df1b8fdea84&)
 
 ## Soal 2
 
