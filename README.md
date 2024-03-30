@@ -95,8 +95,15 @@ Tidak ada kendala.
 ### Revisi
 Pada bagian 1b terjadi kesalahan dalam menampilkan informasi yang seharusnya menampilkan customer segment namun malah menampilkan nama pelanggan. Untuk memperbaiki kesalahan ini, saya telah merevisi kode yang saya gunakan. Dengan cara mengganti bagian $6 yaitu kolom nama pelanggan menjadi $7 yaitu kolom customer segment. Berikut ini adalah perbaikan kode saya beserta penjelasan rinci setiap kodenya yang saya lampirkan dalam komentar:
  ```sh
-echo Menampilkan customer segment atau pelanggan yang memiliki profit paling kecil.
-awk -F ',' 'NR > 1 {profits[$6] += $20; if (profits[$6] < min_profit || min_profit == "") min_profit = profits[$6]} END {for (buyer in profits) if (profits[buyer] == min_profit) print buyer, profits[buyer]}' Sandbox.csv
+echo Menampilkan customer segment yang memiliki profit paling kecil.
+awk -F ',' 'NR > 1 { if (min_profit == "" || $20 < min_profit) { min_profit = $20; min_segment = $7; }} END { print min_segment, min_profit }' Sandbox.csv
+# -F ',': menetapkan pemisah antar kolom.
+# NR > 1: memastikan bahwa proses awk dimulai dari baris kedua, melewati header.
+# $7: Kolom customer segment.
+# $20: Kolom profit.
+# if (min_profit == "" || $20 < min_profit) { min_profit = $20; min_segment = $7; }: memeriksa dan memperbarui nilai profit terkecil dari customer segment.
+# END: penanda blok kode yang akan dijalankan setelah semua baris diproses.
+# print min_segment, min_profit: perintah menampilkan customer segment dengan profit terkecil.
 ```
 
 ## Soal 2
