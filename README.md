@@ -188,6 +188,10 @@ test3@mail:Alex:favorite series?:Skibidi Toilet:NzdmZkpKYWtqc2RsZmgK
 zolguroth.thedestroyer99@mail:Zolguroth:where is the chicken:the oven:RUVGamRhZmg0NGYK
 test5@mail:Ann:favorite video game?:among us:YWtsc2RmamFzO2tkZmxqNDQqSAo=
 ```
+Berikut merupakan contoh register user:
+
+![alt text](https://cdn.discordapp.com/attachments/1071478813566976151/1223670975321735251/image.png?ex=661ab367&is=66083e67&hm=0250ce007f7586a2de8f8ed20c117c56f868cbc1dd5633c563490080d52d2ff7&)
+
 
 ### login.sh
 Script berikutnya merupakan sebuah program login untuk para user yang sudah terdaftar. Hal pertama yang seorang pengguna akan lihat adalah interface login yang berisi 2 pilihan yang dibuat dengan menggunakan sistem menu angka switch case.
@@ -253,6 +257,11 @@ member() {
     return 0
 }
 ```
+Berikut adalah contoh login member berhasil:
+
+![alt text](https://cdn.discordapp.com/attachments/1071478813566976151/1223671601518870528/image.png?ex=661ab3fc&is=66083efc&hm=3ad5dee68c9aa0c750251040c5b1008c6c5bf25a86ee3fd8649f414124455a79&)
+
+
 Berikutnya terdapat sebuah fungsi yang berfungsi untuk menampilkan password suatu user bila **berhasil menjawab security question** yang sudah dibuat saat registrasi. 
 
 Menggunakan sistem pencarian email yang sama dengan fungsi sebelumnya, fungsi ini menampilkan security question dari email yang tersedia melalui `grep` dan `cut`.
@@ -282,6 +291,11 @@ i_forgor() {
     fi
 }
 ```
+Berikut adalah contoh tampilan password:
+
+![alt text](https://cdn.discordapp.com/attachments/1071478813566976151/1223671992373477376/image.png?ex=661ab459&is=66083f59&hm=bcfee80ee4fea7c83935badb8d10b7a6ed8dfcd6301c6052625f9b47acb2b42c&)
+
+
 Fungsi berikutnya adalah menu admin yang hanya dapat diakses ketika email yang telah diregistrasi memiliki kata admin. Menggunakan sistem menu angka switch case yang sama seperti yang telah dibuat sebelumnya, seorang admin dapat memilih untuk add user, edit user, ataupun delete user.
 
 Fungsi ini juga akan mengulang dirinya sendiri bila input tidak sesuai, dan dari ketiga fungsi admin yang tersedia, semua diakhiri dengan fungsi admin agar dapat melakukan beberapa perintah admin secara berturut-turut hingga selesai pekerjaan yang diperlukan.
@@ -312,6 +326,11 @@ admin() {
     return 0
 }
 ```
+Berikut adalah tampilan admin:
+
+![alt text](https://media.discordapp.net/attachments/1071478813566976151/1223672280392142989/image.png?ex=661ab49e&is=66083f9e&hm=b4457267817c2b56096c6063124392b3136796af29fe2a282aa6e7387a0e06ff&=&format=webp&quality=lossless&width=604&height=525)
+
+
 Fungsi admin pertama merupakan `adduser()` yang merupakan hal yang identik dengan script `login.sh`
 ```sh
 adduser() {
